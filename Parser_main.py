@@ -1,23 +1,30 @@
-from all_classes_list import *
-import os
-import logging
 from dotenv import load_dotenv
 load_dotenv()
+import os
+from all_classes_list import *
+import logging
 import sys
-
+from pyvirtualdisplay import Display
 
 if __name__ == '__main__':
 
     #Initializing
     try: 
+        display = Display(visible=0, size=(800,600))
+        display.start()
         # TODO: Think about how to take values. argv?
         db_connection_string = os.getenv('DB_CONNECTION_STRING')
         site_id = 1
         city_id = 3
+        parse_catalogues = False
+        parse_all_catalogues = True
+        catalogue_id = 'https://set-tehniki.com/store/games/igrovye-klaviatury'
 
         # Initializing web Driver
         driver = Driver.get_instance()
-
+        print ("here")
+        print("ip:")
+        driver.get("https://httpbin.org/ip")
         #Creating variable wich contains site_city_id, it will be it's own identeficator
         #City 0 - default city
         site_city_repository = SiteCityRepository()
@@ -38,6 +45,7 @@ if __name__ == '__main__':
         #   Constructing site by it's Algorithm
         site = site_construct_service.site_construct(site_city_id = site_city_id)
 
+        
         # Creating Cataloguinator for site
         cataloguinator = Cataloguinator(
             catalogue_list_parsing_algorithm = globals()[algorithms['Cataloguinator']](),
@@ -45,15 +53,68 @@ if __name__ == '__main__':
             site_city_id = site_city_id
         )
 
-        # Getting Catalogues for site
-        cataloguinator.add_catalogue_list_for_site(
-            site
+        if parse_all_catalogues:
+            # Getting Catalogues for site
+            cataloguinator.add_catalogue_list_for_site(
+                site,
+                parse_catalogues
+            )
+        else:
+            site.catalogues = [catalogue_id]
+
+        # Creating Paginator for site
+        page_change_algorithm_options = algorithm_repository.get_algorithm_options_for_site(
+            site_city_id = site_city_id,
+            algorithm_class_name= algorithms['Paginator']
+        )
+        paginator = Paginator(
+            page_change_algorithm = globals()[algorithms['Paginator']](
+                options = page_change_algorithm_options
+            ),
+            driver = driver 
         )
 
+        articul_get_algorithm_options = algorithm_repository.get_algorithm_options_for_site(
+            site_city_id = site_city_id,
+            algorithm_class_name= algorithms['Articulinator']
+        )
+        articul_get = Articulinator(
+            articul_get_algorithm = globals()[algorithms['Articulinator']](
+                options = articul_get_algorithm_options
+            ),
+            driver = driver 
+        )
+
+        parsing_page_algorithm_options = algorithm_repository.get_algorithm_options_for_site(
+            site_city_id = site_city_id,
+            algorithm_class_name= algorithms['ParsingPage']
+        )
+        parsing_page = ParsingPage(
+            parsing_page_algorithm = globals()[algorithms['ParsingPage']](
+                options = parsing_page_algorithm_options,
+                articul_get = articul_get
+            ),
+            driver = driver 
+        )
+       
+        
+
+        for catalogue in site.catalogues:
+            print("i am here")
+            paginator.current_catalogue = catalogue
+            driver.get(catalogue)
+            while catalogue != None:
+                parsing_page.parse_page_save_items(catalogue)
+                catalogue = paginator.get_next_page()
+                
 
     except:
         e = sys.exc_info()[1]
         print(e.args[0])
+
+    finally:
+        driver.close()
+        driver.quit()
 
 '''
 if __name__ == '__main__':
