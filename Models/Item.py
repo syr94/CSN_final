@@ -19,9 +19,8 @@ class Item(Base):
     id = Column(Integer, nullable=False, unique = True, primary_key=True, autoincrement=True)
     name = Column(VARCHAR(255), nullable=False, unique = True)
     url  = Column(VARCHAR(255), unique = True)
-    inner_site_id = Column(VARCHAR(255), unique = True)
  
-    def __init__(self, name : str = '', url : str = '', inner_site_id : str = '') -> None:
+    def __init__(self, id : int, name : str = '', url : str = '', inner_site_id : str = '') -> None:
+        self.id = id
         self.name = name
         self.url = url
-        self.inner_site_id = inner_site_id

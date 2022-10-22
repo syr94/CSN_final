@@ -7,14 +7,32 @@ from Services.PageChangeService.Paginator import Paginator
 
 class UrlPageChangeAlgorithm:#(PageChangeAlgorithm):
 
-    def __init__(self,current_catalogue : str, adding_url_template : str, link_class_name : str, driver = Driver.get_instance()):
-        self._link_class_name = link_class_name
-        self._adding_url_tempalte = adding_url_template
-        self._driver = driver
-        self._current_catalogue = current_catalogue
+    def __init__(self,
+            options : dict,
+            driver = Driver.get_instance()):
+        self._link_class_name = options['catalogue_pagination_link']
+        self._adding_url_tempalte = options['catalogue_pagination_template']
         self._current_page = 1
+        self._driver = driver
 
-    def get_next_page(self):
+    @property
+    def current_page(self) -> int:
+        return self._current_page
+
+    @current_page.setter
+    def current_page(self, new_current_page : int = 1) -> None:
+        self._current_page = new_current_page
+
+    @property
+    def driver(self) -> Driver:
+        return self._driver
+
+    @driver.setter
+    def driver(self, new_driver : Driver) -> None:
+        self._driver = new_driver
+
+    def get_next_page(self,
+        current_catalogue):
         self._current_page += 1
         result = False
         elements = self._driver.find_elements(by = By.CLASS_NAME, value = self._link_class_name)
@@ -23,7 +41,8 @@ class UrlPageChangeAlgorithm:#(PageChangeAlgorithm):
                 result = True
                 break
         if result:
-            return self._current_catalogue + self._adding_url_tempalte + str(self._current_page)
+            return current_catalogue + self._adding_url_tempalte + str(self._current_page)
+        self.current_page = 1
         return None
 '''
 paginator = UrlPageChangeAlgorithm(

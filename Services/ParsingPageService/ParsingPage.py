@@ -1,15 +1,14 @@
 from abc import abstractclassmethod
 from Services.ParsingPageService.ParsingPageAlgorithmService import ParsingPageAlgorithmService
-
+from Driver.Driver import Driver
 
 class ParsingPage():
 
 
     def __init__(self,
-            page_change_algorithm : ParsingPageAlgorithmService,
-            paginator_options : dict = {}) -> None:
-        self._page_change_algorithm = page_change_algorithm
-        self._paginator_options = paginator_options
+            parsing_page_algorithm : ParsingPageAlgorithmService,
+            driver : Driver = Driver.get_instance()) -> None:
+        self._parsing_page_algorithm = parsing_page_algorithm
 
     @property
     def parsing_page_algorithm(self) -> ParsingPageAlgorithmService:
@@ -22,6 +21,6 @@ class ParsingPage():
             paginator_options : dict = {}) -> None:
         self._parsing_page_algorithm = parsing_page_algorithm
 
-    @abstractclassmethod
-    def parse_page(self):
-        pass
+    
+    def parse_page_save_items(self, catalogue : str):
+        self._parsing_page_algorithm.parse_page(catalogue)

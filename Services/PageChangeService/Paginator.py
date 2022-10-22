@@ -1,5 +1,6 @@
 from abc import abstractclassmethod
 from Services.PageChangeService.PageChangeAlgorithmService import PageChangeAlgorithmService
+from Driver.Driver import Driver
 
 
 class Paginator():
@@ -7,21 +8,21 @@ class Paginator():
 
     def __init__(self,
             page_change_algorithm : PageChangeAlgorithmService,
-            paginator_options : dict = {}) -> None:
+            driver = Driver.get_instance(),
+            ):
         self._page_change_algorithm = page_change_algorithm
-        self._paginator_options = paginator_options
-
+        self._driver = driver
+        self._current_catalogue = ''
+        
     @property
-    def page_change_algorithm(self) -> PageChangeAlgorithmService:
+    def current_catalogue(self) -> str:
+        return self._current_catalogue
 
-        return self._page_change_algorithm
+    @current_catalogue.setter
+    def current_catalogue(self, new_current_catalogue) -> None:
+        self._current_catalogue = new_current_catalogue
 
-    @page_change_algorithm.setter
-    def page_change_algorithm(self,
-            page_change_algorithm: page_change_algorithm,
-            paginator_options : dict = {}) -> None:
-        self._page_change_algorithm = page_change_algorithm
 
-    @abstractclassmethod
     def get_next_page(self):
-        pass
+        pagination_link = self._page_change_algorithm.get_next_page(self._current_catalogue)
+        return pagination_link

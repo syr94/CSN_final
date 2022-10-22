@@ -18,6 +18,7 @@ class AbstractRepository(ABC):
     def __init__(self) -> None:
         try:
             db_connection_string = os.getenv('DB_CONNECTION_STRING')
+            print("connecting to DB:", os.getenv('DB_CONNECTION_STRING'))
             self.engine = create_engine(db_connection_string)
             Base = declarative_base()
             Base.metadata.create_all(self.engine)

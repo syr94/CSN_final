@@ -28,20 +28,27 @@ class Cataloguinator():
         self._catalogue_list_parsing_algorithm = catalogue_list_parsing_algorithm
 
     def add_catalogue_list_for_site(self,
-            site):
+            site,
+            parse_catalogues):
         catalogue_repository = CatalogueRepository()
-        catalogues = self._catalogue_list_parsing_algorithm.get_catalogue_list(
-            main_page_url = site.main_page_url,
-            site_city_id = self._site_city_id,
-            driver = self._driver
-        )
-        for catalogue in catalogues:
-            #TODO make it better, may be get_catalogue_list should return dict {name : url}
-            #TODO think about how to handle @actual
-            catalogue_item = Catalogue(
-                name = catalogue.split('/')[-1],
-                url = catalogue,
+        
+        if parse_catalogues:
+            catalogues = self._catalogue_list_parsing_algorithm.get_catalogue_list(
+                main_page_url = site.main_page_url,
                 site_city_id = self._site_city_id,
-                actual = 1
+                driver = self._driver
             )
-            catalogue_repository.update(catalogue_item)
+            for catalogue in catalogues:
+                #TODO make it better, may be get_catalogue_list should return dict {name : url}
+                #TODO think about how to handle @actual
+                catalogue_item = Catalogue(
+                    name = catalogue.split('/')[-1],
+                    url = catalogue,
+                    site_city_id = self._site_city_id,
+                    actual = 1
+                )
+                catalogue_repository.update(catalogue_item)
+        else:
+            catalogue_items = catalogue_repository.find_all_by(by = "site_city_id", value = self._site_city_id)
+            catalogues = [catalogue_item.url for catalogue_item in catalogue_items]
+        site.catalogues = catalogues
