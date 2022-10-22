@@ -4,14 +4,11 @@ import os
 from all_classes_list import *
 import logging
 import sys
-from pyvirtualdisplay import Display
 
 if __name__ == '__main__':
 
     #Initializing
     try: 
-        display = Display(visible=0, size=(800,600))
-        display.start()
         # TODO: Think about how to take values. argv?
         db_connection_string = os.getenv('DB_CONNECTION_STRING')
         site_id = 1
