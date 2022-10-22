@@ -79,6 +79,16 @@ from Services.SiteConstructService.SiteConstructService import SiteConstructServ
 from Services.SiteConstructService.SiteConstructAlgorithm import SiteConstructAlgorithm
 from Services.SiteConstructService.SiteConstractWithXPathParameters import SiteConstractWithXPathParameters
 
+# 6. SiteItemArticulGetService
+
+from Services.SiteItemArticulGetService.Articulinator import Articulinator
+from Services.SiteItemArticulGetService.ArticulGetAlgorithm import ArticulGetAlgorithm
+from Services.SiteItemArticulGetService.ArticulGetByLink import ArticulGetByLink
+
+# 7. ScreenshotService
+
+from Services.ScreenshotService.ScreenshotService import ScreenshotService
+
 '''
 
 Tools
